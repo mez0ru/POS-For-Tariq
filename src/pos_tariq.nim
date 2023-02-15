@@ -5,6 +5,21 @@ from std/os import getEnv, fileExists, existsEnv
 import std/[terminal, sequtils]
 import csvtable, strutils
 import tables
+import tinyre
+import encodings
+
+proc readFile*(filePath:string,
+               sourceEncoding:string,
+               destEncoding:string = "UTF8"): string =
+  var file:File
+  if not open(file, filePath):
+    raise newException(IOError,"Could not open file:" & filePath)
+  defer:file.close()
+  let text = file.readAll()
+  if cmpIgnoreCase(destEncoding,sourceEncoding) != 0 :
+    result = text.convert(destEncoding, sourceEncoding)
+  else:
+    result = text
 
 when isMainModule:
   overload()
@@ -37,18 +52,17 @@ when isMainModule:
   if not fileExists(pos_f):
     stdout.styledWriteLine fgRed, "POS_INPUT_FILE's File Does Not Exist, check and run again."
     isError = true
-  if not fileExists(output_f):
-    stdout.styledWriteLine fgRed, "OUTPUT_FILE's File Does Not Exist, check and run again."
-    isError = true
 
   if isError:
     system.quit 1
 
   var items = newTable[string, int]()
-  let f_pos = open(pos_f)
-  var line: string
+  let f_pos = readFile(pos_f, "UTF16")
+  let posContent = f_pos.replace(reG("  +"), "\n").replace(reG("\r"), "")
 
-  while readLine(f_pos, line):
+  for line in posContent.split('\n'):
+    if line.isEmptyOrWhitespace or not isDigit(line[0]):
+      continue
     let lineWithLeadingZeros = intToStr(parseInt(line), 13)
     if items.hasKey lineWithLeadingZeros:
       items[lineWithLeadingZeros] += 1
@@ -64,7 +78,6 @@ when isMainModule:
           csvOutput.writeRow(oitem)
         break
 
-  f_pos.close
   csvIn.close
   csvOutput.close
 

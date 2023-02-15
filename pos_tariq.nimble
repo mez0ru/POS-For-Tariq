@@ -13,3 +13,4 @@ bin           = @["pos_tariq"]
 requires "nim >= 1.6.10"
 requires "dotenv"
 requires "csvtable"
+requires "tinyre"
