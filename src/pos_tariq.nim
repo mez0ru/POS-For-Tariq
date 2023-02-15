@@ -6,9 +6,9 @@ import std/[terminal, sequtils]
 import csvtable, strutils
 import tables
 
-overload()
-
 when isMainModule:
+  overload()
+
   stdout.styledWriteLine {styleBright, styleBlink, styleUnderscore}, "Copyright (C) Hamzah Al-washali 2023."
   stdout.styledWriteLine fgGreen, "\nPrint POS entries from two inputs, database and items."
   stdout.styledWriteLine fgBlue, "In case you want to edit any of the inputs or output file names, you can change them from .env file."
@@ -23,6 +23,9 @@ when isMainModule:
   if not existsEnv("OUTPUT_FILE"):
     stdout.styledWriteLine fgRed, "OUTPUT_FILE Variable does not exist in .env file, check and run again."
     isError = true
+
+  if isError:
+    system.quit 1
 
   let database_f = getEnv("DATABASE_INPUT_FILE")
   let pos_f = getEnv("POS_INPUT_FILE")
