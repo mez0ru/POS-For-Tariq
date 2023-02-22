@@ -1,0 +1,16 @@
+desc: Run when the pos.txt file change
+triggers:
+- name: POS_generated_file
+  pattens:
+  - 'aaaa.txt'
+  env:
+    DEBUG: "1"
+  cmd: .\\pos_tariq.exe
+  shell: false
+  delay: 100ms
+  stop_timeout: 500ms
+  signal: KILL
+  kill_signal: ""
+watch_paths:
+- .
+watch_depth: 0
